@@ -25,9 +25,9 @@ gamesRouter.post('/seed/:count', async (req, res) => {
     await Game.deleteMany({});
     for (let i = 0; i < count; i++) {
         let game = new Game({
-            title: faker.lorem.slug(),
-            description: faker.lorem.text(),
-            developer: faker.person.fullName()
+            title: faker.commerce.productName(),
+            description: faker.commerce.productDescription(),
+            developer: faker.company.name()
         });
         await game.save();
     }
