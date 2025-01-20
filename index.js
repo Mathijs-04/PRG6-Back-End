@@ -26,7 +26,7 @@ app.use((req, res, next) => {
     }
 });
 
-app.use('/notes', notesRouter);
+app.use('/games', gamesRouter);
 
 app.listen(process.env.EXPRESS_PORT, () => {
     console.log(`Server is listening on port ${process.env.EXPRESS_PORT}`);
