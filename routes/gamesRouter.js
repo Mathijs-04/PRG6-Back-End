@@ -158,7 +158,7 @@ gamesRouter.delete('/:id', async (req, res) => {
     try {
         const result = await Game.deleteOne({_id: id});
         if (result.deletedCount > 0) {
-            res.status(204).json({message: `Game ${id} deleted`});
+            res.status(204).send();
         } else {
             res.status(404).json({message: `Game ${id} not found`});
         }
