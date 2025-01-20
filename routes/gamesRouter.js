@@ -59,8 +59,8 @@ gamesRouter.get('/', async (req, res) => {
             return res.status(422).json({error: "Page and limit should be numbers greater than 0"});
         }
 
-        const totalGames = await Game.countDocuments();
-        const totalPages = Math.ceil(totalGames / limit);
+        const totalItems = await Game.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
 
         games = await Game.find({})
             .skip((page - 1) * limit)
@@ -70,7 +70,7 @@ gamesRouter.get('/', async (req, res) => {
             currentPage: page,
             currentItems: limit,
             totalPages: totalPages,
-            totalGames: totalGames,
+            totalItems: totalItems,
             _links: {
                 first: {
                     page: 1,
@@ -92,13 +92,13 @@ gamesRouter.get('/', async (req, res) => {
         };
     } else {
         games = await Game.find({}) || [];
-        const totalGames = games.length;
+        const totalItems = games.length;
 
         pagination = {
             currentPage: 1,
-            currentItems: totalGames,
+            currentItems: totalItems,
             totalPages: 1,
-            totalItems: totalGames,
+            totalItems: totalItems,
             _links: {
                 first: {
                     page: 1,
