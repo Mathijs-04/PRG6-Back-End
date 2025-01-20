@@ -22,16 +22,20 @@ gamesRouter.post('/seed/:count', async (req, res) => {
         return res.status(400).json({message: "Invalid count parameter"});
     }
 
-    await Game.deleteMany({});
-    for (let i = 0; i < count; i++) {
-        let game = new Game({
-            title: faker.commerce.productName(),
-            description: faker.commerce.productDescription(),
-            developer: faker.company.name()
-        });
-        await game.save();
+    try {
+        await Game.deleteMany({});
+        for (let i = 0; i < count; i++) {
+            let game = new Game({
+                title: faker.commerce.productName(),
+                description: faker.commerce.productDescription(),
+                developer: faker.company.name()
+            });
+            await game.save();
+        }
+        res.status(201).json({message: `${count} games seeded`});
+    } catch (error) {
+        res.status(500).json({error: "An error occurred while seeding games"});
     }
-    res.status(201).json({message: `${count} games seeded`});
 });
 
 gamesRouter.post('/', async (req, res) => {
@@ -41,21 +45,24 @@ gamesRouter.post('/', async (req, res) => {
         return res.status(400).json({message: "Missing required fields: title, description, developer"});
     }
 
-    let game = new Game({title, description, developer});
-    await game.save();
-    res.status(201).json(game);
+    try {
+        let game = new Game({title, description, developer});
+        await game.save();
+        res.status(201).json(game);
+    } catch (error) {
+        res.status(500).json({error: "An error occurred while creating the game"});
+    }
 });
 
 gamesRouter.get('/', async (req, res) => {
     let pagination = {};
     let games = [];
 
-    if (req.query.page && req.query.limit) {
+    try {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
 
-        const page = parseInt(req.query.page, 10);
-        const limit = parseInt(req.query.limit, 10);
-
-        if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+        if (page < 1 || limit < 1) {
             return res.status(422).json({error: "Page and limit should be numbers greater than 0"});
         }
 
@@ -68,7 +75,7 @@ gamesRouter.get('/', async (req, res) => {
 
         pagination = {
             currentPage: page,
-            currentItems: limit,
+            currentItems: games.length,
             totalPages: totalPages,
             totalItems: totalItems,
             _links: {
@@ -90,28 +97,8 @@ gamesRouter.get('/', async (req, res) => {
                 } : null
             }
         };
-    } else {
-        games = await Game.find({}) || [];
-        const totalItems = games.length;
-
-        pagination = {
-            currentPage: 1,
-            currentItems: totalItems,
-            totalPages: 1,
-            totalItems: totalItems,
-            _links: {
-                first: {
-                    page: 1,
-                    href: process.env.BASE_URL
-                },
-                last: {
-                    page: 1,
-                    href: process.env.BASE_URL
-                },
-                previous: null,
-                next: null
-            }
-        };
+    } catch (error) {
+        return res.status(500).json({error: "An error occurred while fetching games"});
     }
 
     res.status(200).json({
@@ -138,7 +125,7 @@ gamesRouter.get('/:id', async (req, res) => {
             res.status(404).json({message: `Game ${id} not found`});
         }
     } catch (error) {
-        res.status(400).json({message: "Invalid game ID"});
+        res.status(500).json({error: "An error occurred while fetching the game"});
     }
 });
 
@@ -162,7 +149,7 @@ gamesRouter.put('/:id', async (req, res) => {
             res.status(404).json({message: `Game ${id} not found`});
         }
     } catch (error) {
-        res.status(400).json({message: "Invalid game ID"});
+        res.status(500).json({error: "An error occurred while updating the game"});
     }
 });
 
@@ -176,7 +163,7 @@ gamesRouter.delete('/:id', async (req, res) => {
             res.status(404).json({message: `Game ${id} not found`});
         }
     } catch (error) {
-        res.status(400).json({message: "Invalid game ID"});
+        res.status(500).json({error: "An error occurred while deleting the game"});
     }
 });
 
