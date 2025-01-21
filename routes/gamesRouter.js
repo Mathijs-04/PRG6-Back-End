@@ -16,25 +16,31 @@ gamesRouter.options('/:id', async (req, res) => {
     res.status(204).send();
 });
 
-gamesRouter.post('/seed/:count', async (req, res) => {
-    const count = parseInt(req.params.count, 10);
-    if (isNaN(count) || count <= 0) {
-        return res.status(400).json({message: "Invalid count parameter"});
-    }
+gamesRouter.post('/', async (req, res, next) => {
+    const {title, description, developer, METHOD, COUNT} = req.body;
 
-    try {
-        await Game.deleteMany({});
-        for (let i = 0; i < count; i++) {
-            let game = new Game({
-                title: faker.commerce.productName(),
-                description: faker.commerce.productDescription(),
-                developer: faker.company.name()
-            });
-            await game.save();
+    if (METHOD === 'SEED') {
+        const count = parseInt(req.params.count, 10);
+        if (isNaN(count) || count <= 0) {
+            return res.status(400).json({message: "Invalid count parameter"});
         }
-        res.status(201).json({message: `${count} games seeded`});
-    } catch (error) {
-        res.status(500).json({error: "An error occurred while seeding games"});
+
+        try {
+            await Game.deleteMany({});
+            for (let i = 0; i < count; i++) {
+                let game = new Game({
+                    title: faker.commerce.productName(),
+                    description: faker.commerce.productDescription(),
+                    developer: faker.company.name()
+                });
+                await game.save();
+            }
+            res.status(201).json({message: `${count} games seeded`});
+        } catch (error) {
+            res.status(500).json({error: "An error occurred while seeding games"});
+        }
+    } else {
+        next();
     }
 });
 
