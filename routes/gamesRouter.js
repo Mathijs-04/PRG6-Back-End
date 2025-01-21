@@ -124,21 +124,26 @@ gamesRouter.get('/', async (req, res) => {
 gamesRouter.get('/:id', async (req, res) => {
     const id = req.params.id;
     const ifModifiedSince = req.headers['if-modified-since'];
+
     try {
         const game = await Game.findById(id);
+
         if (game) {
-            const lastModified = game.updatedAt.toUTCString();
-            if (ifModifiedSince && new Date (ifModifiedSince) >= new Date(lastModified)) {
+            const lastModified = new Date(game.updatedAt).toUTCString();
+
+            if (ifModifiedSince && new Date(lastModified) <= new Date(ifModifiedSince)) {
                 return res.status(304).set('Last-Modified', lastModified).send();
             }
+
             res.status(200).set('Last-Modified', lastModified).json(game);
         } else {
-            res.status(404).json({message: `Game ${id} not found`});
+            res.status(404).json({ message: `Game ${id} not found` });
         }
     } catch (error) {
-        res.status(500).json({error: "An error occurred while fetching the game"});
+        res.status(500).json({ error: "An error occurred while fetching the game" });
     }
 });
+
 
 gamesRouter.put('/:id', async (req, res) => {
     const id = req.params.id;
