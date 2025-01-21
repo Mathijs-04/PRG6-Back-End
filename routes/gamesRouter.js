@@ -17,10 +17,10 @@ gamesRouter.options('/:id', async (req, res) => {
 });
 
 gamesRouter.post('/', async (req, res, next) => {
-    const {title, description, developer, METHOD, COUNT} = req.body;
+    const {title, description, developer, METHOD, count} = req.body;
 
     if (METHOD === 'SEED') {
-        const count = parseInt(req.params.count, 10);
+        const count = parseInt(req.body.count, 10);
         if (isNaN(count) || count <= 0) {
             return res.status(400).json({message: "Invalid count parameter"});
         }
