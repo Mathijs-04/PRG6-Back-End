@@ -123,10 +123,15 @@ gamesRouter.get('/', async (req, res) => {
 
 gamesRouter.get('/:id', async (req, res) => {
     const id = req.params.id;
+    const ifModifiedSince = req.headers['if-modified-since'];
     try {
         const game = await Game.findById(id);
         if (game) {
-            res.status(200).json(game);
+            const lastModified = game.updatedAt.toUTCString();
+            if (ifModifiedSince && new Date (ifModifiedSince) >= new Date(lastModified)) {
+                return res.status(304).set('Last-Modified', lastModified).send();
+            }
+            res.status(200).set('Last-Modified', lastModified).json(game);
         } else {
             res.status(404).json({message: `Game ${id} not found`});
         }
