@@ -121,21 +121,7 @@ gamesRouter.get('/', async (req, res) => {
     });
 });
 
-// Old get function (accepted by checker)
-// gamesRouter.get('/:id', async (req, res) => {
-//     const id = req.params.id;
-//     try {
-//         const game = await Game.findById(id);
-//         if (game) {
-//             res.status(200).json(game);
-//         } else {
-//             res.status(404).json({ message: `Game ${id} not found` });
-//         }
-//     } catch (error) {
-//         res.status(400).json({ message: "Invalid game ID" });
-//     }
-// });
-
+//Er gaat nog iets mis bij de combinatie van the if-modified-since en pagination. Wanneer de nieuwe get wordt toegevoegd en pagination verwijderd, dan werkt de checker.
 gamesRouter.get('/:id', async (req, res) => {
     const id = req.params.id;
     const ifModifiedSince = req.headers['if-modified-since'];
