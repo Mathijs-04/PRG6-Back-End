@@ -159,6 +159,10 @@ gamesRouter.put('/:id', async (req, res) => {
     }
 });
 
+gamesRouter.patch('/:id', async (req, res) => {
+
+});
+
 gamesRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
     try {
