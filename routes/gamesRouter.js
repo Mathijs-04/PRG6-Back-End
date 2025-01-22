@@ -66,18 +66,22 @@ gamesRouter.get('/', async (req, res) => {
 
     try {
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 10;
+        const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
 
-        if (page < 1 || limit < 1) {
-            return res.status(422).json({error: "Page and limit should be numbers greater than 0"});
+        if (page < 1 || (limit !== null && limit < 1)) {
+            return res.status(422).json({ error: "Page and limit should be numbers greater than 0" });
         }
 
         const totalItems = await Game.countDocuments();
-        const totalPages = Math.ceil(totalItems / limit);
+        const totalPages = limit ? Math.ceil(totalItems / limit) : 1;
 
-        games = await Game.find({})
-            .skip((page - 1) * limit)
-            .limit(limit);
+        if (limit) {
+            games = await Game.find({})
+                .skip((page - 1) * limit)
+                .limit(limit);
+        } else {
+            games = await Game.find({});
+        }
 
         pagination = {
             currentPage: page,
@@ -87,24 +91,24 @@ gamesRouter.get('/', async (req, res) => {
             _links: {
                 first: {
                     page: 1,
-                    href: `${process.env.BASE_URL}?page=1&limit=${limit}`
+                    href: `${process.env.BASE_URL}?page=1&limit=${limit || totalItems}`
                 },
                 last: {
                     page: totalPages,
-                    href: `${process.env.BASE_URL}?page=${totalPages}&limit=${limit}`
+                    href: `${process.env.BASE_URL}?page=${totalPages}&limit=${limit || totalItems}`
                 },
                 previous: page > 1 ? {
                     page: page - 1,
-                    href: `${process.env.BASE_URL}?page=${page - 1}&limit=${limit}`
+                    href: `${process.env.BASE_URL}?page=${page - 1}&limit=${limit || totalItems}`
                 } : null,
                 next: page < totalPages ? {
                     page: page + 1,
-                    href: `${process.env.BASE_URL}?page=${page + 1}&limit=${limit}`
+                    href: `${process.env.BASE_URL}?page=${page + 1}&limit=${limit || totalItems}`
                 } : null
             }
         };
     } catch (error) {
-        return res.status(500).json({error: "An error occurred while fetching games"});
+        return res.status(500).json({ error: "An error occurred while fetching games" });
     }
 
     res.status(200).json({
