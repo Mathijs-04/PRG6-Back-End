@@ -186,10 +186,10 @@ gamesRouter.patch('/:id', async (req, res) => {
             id,
             {
                 $set: {
+                    ...(favorite && {favorite}),
                     ...(title && {title}),
                     ...(description && {description}),
                     ...(developer && {developer}),
-                    ...(favorite && {favorite}),
                 }
             },
             {new: true, runValidators: true}
