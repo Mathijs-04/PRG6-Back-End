@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const gameSchema = new mongoose.Schema({
+    favorite: {type: Boolean, default: false},
     title: {type: String},
     description: {type: String},
     developer: {type: String},
-    favorite: {type: Boolean, default: false},
 }, {
     timestamps: true,
     toJSON: {
