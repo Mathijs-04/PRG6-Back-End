@@ -125,7 +125,6 @@ gamesRouter.get('/', async (req, res) => {
     });
 });
 
-//Er gaat nog iets mis bij de combinatie van the if-modified-since en pagination. Wanneer de nieuwe get wordt toegevoegd en pagination verwijderd, dan werkt de checker.
 gamesRouter.get('/:id', async (req, res) => {
     const id = req.params.id;
     const ifModifiedSince = req.headers['if-modified-since'];
