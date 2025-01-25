@@ -206,21 +206,6 @@ gamesRouter.patch('/:id', async (req, res) => {
     }
 });
 
-// try {
-//     let game = await Game.findById(id);
-//     if (game) {
-//         Object.keys(updateData).forEach(key => {
-//             game[key] = updateData [key];
-//         });
-//         await game.save();
-//         res.status(200).json({message: `Game ${id} partially updated`});
-//     } else {
-//         res.status(404).json({message: `Game ${id} not found`});
-//     }
-// } catch (error) {
-//     res.status(500).json({error: "An error occurred while updating the game"});
-// }
-
 gamesRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
     try {
