@@ -69,7 +69,7 @@ gamesRouter.get('/', async (req, res) => {
         const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
 
         if (page < 1 || (limit !== null && limit < 1)) {
-            return res.status(422).json({ error: "Page and limit should be numbers greater than 0" });
+            return res.status(422).json({error: "Page and limit should be numbers greater than 0"});
         }
 
         const totalItems = await Game.countDocuments();
@@ -108,7 +108,7 @@ gamesRouter.get('/', async (req, res) => {
             }
         };
     } catch (error) {
-        return res.status(500).json({ error: "An error occurred while fetching games" });
+        return res.status(500).json({error: "An error occurred while fetching games"});
     }
 
     res.status(200).json({
@@ -141,10 +141,10 @@ gamesRouter.get('/:id', async (req, res) => {
 
             res.status(200).set('Last-Modified', lastModified).json(game);
         } else {
-            res.status(404).json({ message: `Game ${id} not found` });
+            res.status(404).json({message: `Game ${id} not found`});
         }
     } catch (error) {
-        res.status(500).json({ error: "An error occurred while fetching the game" });
+        res.status(500).json({error: "An error occurred while fetching the game"});
     }
 });
 
@@ -175,23 +175,51 @@ gamesRouter.put('/:id', async (req, res) => {
 
 gamesRouter.patch('/:id', async (req, res) => {
     const id = req.params.id;
-    const updateData = req.body;
+    const {title, description, developer, favorite} = req.body;
+
+    if (!title && !description && !developer && !favorite) {
+        return res.status(400).send({error: 'Patch requires one updated field'})
+    }
 
     try {
-        let game = await Game.findById(id);
-        if (game) {
-            Object.keys(updateData).forEach(key => {
-                game[key] = updateData [key];
-            });
-            await game.save();
-            res.status(200).json({message: `Game ${id} partially updated`});
-        } else {
+        const updatedGame = await Game.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    ...(title && {title}),
+                    ...(description && {description}),
+                    ...(developer && {developer}),
+                    ...(favorite && {favorite}),
+                }
+            },
+            {new: true, runValidators: true}
+        );
+
+        if (!updatedGame) {
             res.status(404).json({message: `Game ${id} not found`});
         }
+
+        res.status(200).json({message: `Game ${id} partially updated`});
+
     } catch (error) {
         res.status(500).json({error: "An error occurred while updating the game"});
     }
 });
+
+// try {
+//     let game = await Game.findById(id);
+//     if (game) {
+//         Object.keys(updateData).forEach(key => {
+//             game[key] = updateData [key];
+//         });
+//         await game.save();
+//         res.status(200).json({message: `Game ${id} partially updated`});
+//     } else {
+//         res.status(404).json({message: `Game ${id} not found`});
+//     }
+// } catch (error) {
+//     res.status(500).json({error: "An error occurred while updating the game"});
+// }
 
 gamesRouter.delete('/:id', async (req, res) => {
     const id = req.params.id;
