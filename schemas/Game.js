@@ -4,6 +4,7 @@ const gameSchema = new mongoose.Schema({
     title: {type: String},
     description: {type: String},
     developer: {type: String},
+    favorite: {type: Boolean, default: false},
 }, {
     timestamps: true,
     toJSON: {
