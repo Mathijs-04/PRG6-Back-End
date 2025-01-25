@@ -11,8 +11,8 @@ gamesRouter.options('/', async (req, res) => {
 });
 
 gamesRouter.options('/:id', async (req, res) => {
-    res.set('Allow', 'GET, PUT, DELETE, OPTIONS');
-    res.set('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
+    res.set('Allow', 'GET, PUT, PATCH, DELETE, OPTIONS');
+    res.set('Access-Control-Allow-Methods', 'GET, PUT, PATCH, DELETE, OPTIONS');
     res.status(204).send();
 });
 
