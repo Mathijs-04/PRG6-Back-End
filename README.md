@@ -1,6 +1,6 @@
 To Do:
 -
-Add a favourite feature
+Add a favorite feature
 
 Add actual game data
 
