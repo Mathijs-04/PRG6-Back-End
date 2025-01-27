@@ -1,7 +1,6 @@
 import Game from "../schemas/Game.js";
 import {Router} from "express";
 import {faker} from "@faker-js/faker";
-import axios from "axios";
 
 const gamesRouter = new Router();
 
@@ -28,42 +27,14 @@ gamesRouter.post('/', async (req, res, next) => {
 
         try {
             await Game.deleteMany({});
-
-            // Fetch game data from RAWG API
-            const fetchGamesFromAPI = async () => {
-                const games = [];
-                const pages = Math.ceil(count / 20);
-
-                for (let page = 1; page <= pages; page++) {
-                    const response = await axios.get('https://api.rawg.io/api/games', {
-                        params: {
-                            key: process.env.RAWG_API_KEY,
-                            page: page,
-                            page_size: 20,
-                            platforms: '1,2,3,4',
-                        },
-                    });
-
-                    games.push(...response.data.results);
-                }
-
-                return games;
-            };
-
-            const gamesData = await fetchGamesFromAPI();
-
             for (let i = 0; i < count; i++) {
-                const game = gamesData[i];
-
-                const newGame = new Game({
-                    title: game.name,
-                    description: game.description_raw || 'No description available.',
-                    developer: game.developers.map(dev => dev.name).join(', ') || 'Unknown developer',
+                let game = new Game({
+                    title: faker.commerce.productName(),
+                    description: faker.commerce.productDescription(),
+                    developer: faker.company.name()
                 });
-
-                await newGame.save();
+                await game.save();
             }
-
             res.status(201).json({message: `${count} games seeded`});
         } catch (error) {
             res.status(500).json({error: "An error occurred while seeding games"});
