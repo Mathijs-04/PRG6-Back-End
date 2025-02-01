@@ -26,7 +26,7 @@ gamesRouter.post('/', async (req, res, next) => {
         }
 
         try {
-            await Game.deleteMany({});
+            // await Game.deleteMany({});
             for (let i = 0; i < count; i++) {
                 let game = new Game({
                     title: faker.commerce.productName(),
